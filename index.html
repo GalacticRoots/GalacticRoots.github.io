@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Agrícola Mundial</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="game-header">
+        <h1 id="game-title">Juego Agrícola Mundial</h1>
+        <div id="game-level">Nivel: 1 (Principiante)</div>
+    </div>
+    <div id="game-stats">
+        <p><strong>Dinero:</strong> $<span id="money">0</span></p>
+        <p><strong>Puntuación:</strong> <span id="score">0</span></p>
+    </div>
+    <div id="map"></div>
+    <div id="info-panel">
+        <h2 id="country-name">Selecciona un país</h2>
+        <div id="agricultural-data">
+            <p><strong>Humedad del suelo:</strong> <span id="soil-moisture">--</span>%</p>
+            <p><strong>Temperatura:</strong> <span id="temperature">--</span>°C</p>
+            <p><strong>Radiación solar:</strong> <span id="solar-radiation">--</span>%</p>
+            <p><strong>Tipo de suelo:</strong> <span id="soil-type">--</span></p>
+            <p><strong>Cultivos recomendados:</strong> <span id="suitable-crops">--</span></p>
+        </div>
+        <div id="planting-section">
+            <select id="crop-selector">
+                <option value="">Selecciona un cultivo</option>
+            </select>
+            <button id="plant-seed">Plantar semilla ($100)</button>
+            <button id="harvest-crop" disabled>Cosechar</button>
+        </div>
+        <div id="growth-status"></div>
+        <div id="harvest-result"></div>
+        <div id="missions"></div>
+        <div id="level-info"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+/* Fondo general de la página */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e8f5e9; /* Verde muy claro para fondo general */
+    color: #333;
+}
+
+/* Encabezado del juego */
+#game-header {
+    text-align: center;
+    background-color: #2e7d32; /* Verde oscuro para contraste */
+    color: white;
+    padding: 10px;
+    margin: 0;
+}
+
+/* Estadísticas del juego */
+#game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 18px;
+    background-color: #c5e1a5; /* Verde claro para estadísticas */
+    padding: 10px;
+    margin: 0;
+}
+
+/* Contenedor del mapa */
+#map {
+    width: 100%;
+    height: calc(100vh - 80px);
+    position: relative;
+    background-color: #a5d6a7; /* Verde suave para el fondo del mapa */
+}
+
+/* Panel de información */
+#info-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 300px;
+    max-height: calc(100vh - 120px);
+    padding: 15px;
+    background-color: white;
+    box-sizing: border-box;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow-y: auto;
+    z-index: 1000;
+    border: 1px solid #81c784; /* Borde verde claro */
+}
+
+/* Estilo para los datos agrícolas */
+#agricultural-data {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f1f8e9; /* Fondo verde muy claro */
+    border-radius: 5px;
+    border-left: 4px solid #4caf50; /* Verde vibrante */
+}
+
+/* Estilo para el contenedor del mapa de Leaflet */
+.leaflet-container {
+    background-color: #dcedc8; /* Verde claro para el fondo del mapa */
+}
+
+/* Quitar bordes de las fronteras de los países */
+.leaflet-pane .leaflet-overlay-pane svg path {
+    stroke: none !important;
+    fill-opacity: 0.8 !important;
+}
+
+/* Botones y selectores */
+select, button {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #81c784; /* Verde claro */
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #4caf50; /* Verde vibrante */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:disabled {
+    background-color: #bdbdbd; /* Gris para botones deshabilitados */
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background-color: #388e3c; /* Verde oscuro al pasar el mouse */
+}
+
+/* Estado de crecimiento y resultados */
+#growth-status, #harvest-result {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e8f5e9; /* Verde muy claro */
+    border-radius: 5px;
+    border-left: 4px solid #4caf50;
+}
+
+#harvest-result {
+    display: none;
+    background-color: #c8e6c9; /* Verde claro para resultados */
+}
+
+/* Barra de progreso */
+.progress-container {
+    margin: 10px 0;
+}
+
+progress {
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+}
+
+progress::-webkit-progress-bar {
+    background-color: #dcedc8; /* Verde claro para la barra de fondo */
+    border-radius: 10px;
+}
+
+progress::-webkit-progress-value {
+    background-color: #4caf50; /* Verde vibrante para el progreso */
+    border-radius: 10px;
+}

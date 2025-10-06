@@ -2,43 +2,1129 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego Agrícola Mundial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AgriX: Cultiva y Conquista el Mundo</title>
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css" />
+    <!-- Fuentes de Google para el título -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Pantalla de inicio */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #011E48 url('Nasa2.jpg') no-repeat center center;
+            background-size: 50% 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #start-screen.hidden {
+            display: none;
+        }
+
+        #game-logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
+            background-image: url('https://mistralaichatupprodswe.blob.core.windows.net/chat-images/2c/34/74/2c34745b-6476-4206-b5e5-fa950615ee7b/bb8782aa-6aa5-4d37-80c5-e844c547e4a1/1f96311c-6794-4962-b454-c015007bef86?sv=2025-01-05&st=2025-10-05T20%3A32%3A36Z&se=2025-10-05T21%3A32%3A36Z&sr=b&sp=rade&sig=wIWv0XxUPCJ3kIQlCd0T7IMSKs7IHteWNW65kFmQhmM%3D');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        #game-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 4rem;
+            color: white;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
+            margin-bottom: 50px;
+            text-align: center;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); }
+            to { text-shadow: 0 0 15px #fff, 0 0 20px #ff0; }
+        }
+
+        #play-button, #options-button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            margin: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #play-button {
+            background: #4CAF50;
+            color: white;
+        }
+
+        #play-button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #options-button {
+            background: #2196F3;
+            color: white;
+        }
+
+        #options-button:hover {
+            background: #0b7dda;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Pantalla de opciones */
+        #options-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        #language-selector {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+
+        #language-selector h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        #language-selector button {
+            padding: 12px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            width: 120px;
+        }
+
+        #english-lang {
+            background: #2196F3;
+            color: white;
+        }
+
+        #english-lang:hover {
+            background: #0b7dda;
+            transform: scale(1.05);
+        }
+
+        #spanish-lang {
+            background: #4CAF50;
+            color: white;
+        }
+
+        #spanish-lang:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        #back-button {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        #back-button:hover {
+            background: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        /* Contenedor del juego */
+        #game-container {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            background: #f0f0f0;
+        }
+
+        #map {
+            height: 75vh;
+            width: 100%;
+            border: 3px solid #333;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Panel de datos agrícolas */
+        #agricultural-data-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            height: calc(75vh - 40px);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            border: 2px solid #4CAF50;
+        }
+
+        #agricultural-data-panel h3 {
+            margin-top: 0;
+            color: #2e7d32;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .country-info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .country-info-section h4 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+
+        .condition-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .condition-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .condition-value {
+            font-weight: bold;
+        }
+
+        .crop-item {
+            background: #e8f5e9;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .crop-name {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .crop-details {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .crop-yield {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* Resto de los estilos (se mantienen igual) */
+        #game-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        } 
+    
+    #game-info {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    
+    /* Scroll flexible que se adapta al tamaño de la pantalla */
+    height: 60vh; /* 60% del alto de la ventana */
+    max-height: 500px; /* Altura máxima */
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    /* Personalización */
+    scrollbar-width: thin;
+    scrollbar-color: #4CAF50 #f1f1f1;
+}
+
+        #map-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid #ddd;
+        }
+
+        /* Estilos para misiones y niveles */
+        .mission, .level {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background: #f5f5f5;
+        }
+
+        .mission.completed, .level.unlocked {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .mission .progress, .level.locked {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .level.locked {
+            background: #f0f0f0;
+            border-left: 4px solid #ccc;
+        }
+    </style>
 </head>
 <body>
-    <div id="game-header">
-        <h1 id="game-title">Juego Agrícola Mundial</h1>
-        <div id="game-level">Nivel: 1 (Principiante)</div>
+    <!-- Pantalla de inicio -->
+    <div id="start-screen">
+        <div id="game-logo"></div>
+        <h1 id="game-title">AGRIX</h1>
+        <button id="play-button">PLAY / JUGAR</button>
+        <button id="options-button">OPTIONS / OPCIONES</button>
     </div>
-    <div id="game-stats">
-        <p><strong>Dinero:</strong> $<span id="money">0</span></p>
-        <p><strong>Puntuación:</strong> <span id="score">0</span></p>
-    </div>
-    <div id="map"></div>
-    <div id="info-panel">
-        <h2 id="country-name">Selecciona un país</h2>
-        <div id="agricultural-data">
-            <p><strong>Humedad del suelo:</strong> <span id="soil-moisture">--</span>%</p>
-            <p><strong>Temperatura:</strong> <span id="temperature">--</span>°C</p>
-            <p><strong>Radiación solar:</strong> <span id="solar-radiation">--</span>%</p>
-            <p><strong>Tipo de suelo:</strong> <span id="soil-type">--</span></p>
-            <p><strong>Cultivos recomendados:</strong> <span id="suitable-crops">--</span></p>
+
+    <!-- Pantalla de opciones -->
+    <div id="options-screen">
+        <div id="language-selector">
+            <h2>SELECT LANGUAGE / SELECCIONA IDIOMA</h2>
+            <button id="english-lang">ENGLISH</button>
+            <button id="spanish-lang">ESPAÑOL</button>
         </div>
-        <div id="planting-section">
-            <select id="crop-selector">
-                <option value="">Selecciona un cultivo</option>
-            </select>
-            <button id="plant-seed">Plantar semilla ($100)</button>
-            <button id="harvest-crop" disabled>Cosechar</button>
-        </div>
-        <div id="growth-status"></div>
-        <div id="harvest-result"></div>
-        <div id="missions"></div>
-        <div id="level-info"></div>
+        <button id="back-button">BACK / VOLVER</button>
     </div>
+
+    <!-- Contenedor del juego -->
+
+    <div id="game-container">
+
+        <audio id="menu-music" loop>
+            <source src="Audios/MenuSounds.mpeg" type="audio/mpeg">
+        </audio>
+        <audio id="game-music" loop>
+            <source src="Audios/GameSound.mpeg" type="audio/mpeg">
+        </audio>
+
+        <div id="map"></div>
+        
+        <!-- Panel de datos agrícolas -->
+        <div id="agricultural-data-panel">
+            <h3>DATOS AGRÍCOLAS</h3>
+            <div id="agricultural-data-content">
+                <!-- Los datos se cargarán dinámicamente aquí -->
+            </div>
+        </div>
+        
+        <!-- Leyenda del mapa -->
+        <div id="map-legend">
+            <h4>LEGEND / LEYENDA</h4>
+            <div><span style="color: #87CEEB;">■</span> AMERICA / AMÉRICA</div>
+            <div><span style="color: #FFFF00;">■</span> AFRICA / ÁFRICA</div>
+            <div><span style="color: #FFCC00;">■</span> EUROPE / EUROPA</div>
+            <div><span style="color: #FF6600;">■</span> ASIA / ASIA</div>
+            <div><span style="color: #FF0000;">■</span> OCEANIA / OCEANÍA</div>
+        </div>
+        
+        <!-- Información del juego -->
+        <div id="game-info">
+            <h2>GAME INFO / INFORMACIÓN DEL JUEGO</h2>
+            <p>MONEY / DINERO: $<span id="money">200</span></p>
+            <p>SCORE / PUNTUACIÓN: <span id="score">0</span></p>
+            <p>LEVEL / NIVEL: <span id="level">1</span></p>
+            
+            <!-- Información del país seleccionado -->
+            <div id="selected-country-info">
+                <h3>PAÍS SELECCIONADO / SELECTED COUNTRY</h3>
+                <p id="selected-country">Ninguno / None</p>
+                <div id="crop-options" style="display: none; margin-top: 10px;">
+                    <h4>PLANTAR CULTIVO / PLANT CROP</h4>
+                    <button onclick="plantCrop('wheat')">🌾 Trigo / Wheat ($10)</button>
+                    <button onclick="plantCrop('corn')">🌽 Maíz / Corn ($15)</button>
+                    <button onclick="plantCrop('rice')">🍚 Arroz / Rice ($20)</button>
+                    <button onclick="plantCrop('soy')">🫘 Soja / Soy ($25)</button>
+                    <button onclick="harvestCrops()" style="background: #FF9800;">💰 Cosechar / Harvest</button>
+                </div>
+            </div>
+            
+            <!-- Misiones -->
+            <div id="missions"></div>
+            
+            <!-- Información de niveles -->
+            <div id="level-info"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="script.js"></script>
+    <!-- Tu script.js -->
+    <script>
+        // Estado del juego
+        let money = 200;
+        let score = 0;
+        let level = 1;
+        let selectedCountry = null;
+        let plantedSeeds = {};
+        let activeEvents = {};
+        let seedMarkers = {};
+        let countryLabels = {};
+        let map;
+
+        // Misiones del juego
+        let missions = [
+            { id: 1, description: "Plantar 5 cultivos", target: 5, progress: 0, reward: 100, completed: false },
+            { id: 2, description: "Cosechar 3 cultivos", target: 3, progress: 0, reward: 200, completed: false },
+            { id: 3, description: "Ganar $1000", target: 1000, progress: 0, reward: 300, completed: false },
+            { id: 4, description: "Alcanza nivel 2", target: 2, progress: 1, reward: 150, completed: false }
+        ];
+
+        // Niveles del juego
+        const levels = [
+            { id: 1, requiredScore: 0, unlocked: true, description: "Principiante" },
+            { id: 2, requiredScore: 500, unlocked: false, description: "Agricultor" },
+            { id: 3, requiredScore: 1500, unlocked: false, description: "Experto" },
+            { id: 4, requiredScore: 3000, unlocked: false, description: "Maestro" },
+            { id: 5, requiredScore: 5000, unlocked: false, description: "Leyenda" }
+        ];
+
+        // Colores para los continentes
+        const continentColors = {
+            "default": "#888888",
+            "Africa": "#FF5722",
+            "Asia": "#FFC107",
+            "Europe": "#2196F3",
+            "North America": "#9C27B0",
+            "South America": "#4CAF50",
+            "Oceania": "#009688",
+            "Antarctica": "#757575"
+        };
+
+        // Traducción de nombres de países a español
+        const countryTranslations = {
+            "United States of America": "Estados Unidos",
+            "Mexico": "México",
+            "Brazil": "Brasil",
+            "Argentina": "Argentina",
+            "Colombia": "Colombia",
+            "Spain": "España",
+            "France": "Francia",
+            "Germany": "Alemania",
+            "Italy": "Italia",
+            "China": "China",
+            "India": "India",
+            "Japan": "Japón",
+            "Egypt": "Egipto",
+            "Nigeria": "Nigeria",
+            "South Africa": "Sudáfrica",
+            "Australia": "Australia",
+            "Canada": "Canadá",
+            "United Kingdom": "Reino Unido",
+            "Russia": "Rusia",
+            "Indonesia": "Indonesia",
+            "Pakistan": "Pakistán",
+            "Bangladesh": "Bangladés",
+            "Turkey": "Turquía",
+            "Iran": "Irán",
+            "Thailand": "Tailandia",
+            "Vietnam": "Vietnam",
+            "Philippines": "Filipinas",
+            "Peru": "Perú",
+            "Chile": "Chile",
+            "Ecuador": "Ecuador",
+            "Venezuela": "Venezuela",
+            "Bolivia": "Bolivia",
+            "Paraguay": "Paraguay",
+            "Uruguay": "Uruguay"
+        };
+
+        // Datos agrícolas por país
+        const countryData = {
+            "Argentina": {
+                continent: "South America",
+                zone: "Templada",
+                soilMoisture: 60, temperature: 18, solarRadiation: 80, soilType: "Moliso (Pampa)",
+                name: "Argentina",
+                suitableCrops: {
+                    "Soja": { minMoisture: 50, maxMoisture: 75, minTemp: 15, maxTemp: 30, minRadiation: 60, maxRadiation: 95, growthRate: 0.12, yield: 3.2, price: 450 },
+                    "Maíz": { minMoisture: 45, maxMoisture: 70, minTemp: 18, maxTemp: 32, minRadiation: 65, maxRadiation: 100, growthRate: 0.15, yield: 8.5, price: 550 },
+                    "Trigo": { minMoisture: 35, maxMoisture: 65, minTemp: 10, maxTemp: 28, minRadiation: 50, maxRadiation: 90, growthRate: 0.1, yield: 3.8, price: 380 },
+                    "Girasol": { minMoisture: 40, maxMoisture: 65, minTemp: 15, maxTemp: 30, minRadiation: 60, maxRadiation: 95, growthRate: 0.1, yield: 2.1, price: 280 }
+                }
+            },
+            "Brazil": {
+                continent: "South America",
+                zone: "Tropical",
+                soilMoisture: 75, temperature: 25, solarRadiation: 85, soilType: "Oxisol",
+                name: "Brazil",
+                suitableCrops: {
+                    "Café": { minMoisture: 60, maxMoisture: 80, minTemp: 18, maxTemp: 28, minRadiation: 60, maxRadiation: 90, growthRate: 0.08, yield: 1.5, price: 1200 },
+                    "Soja": { minMoisture: 50, maxMoisture: 75, minTemp: 15, maxTemp: 30, minRadiation: 60, maxRadiation: 95, growthRate: 0.12, yield: 3.2, price: 450 },
+                    "Caña de Azúcar": { minMoisture: 65, maxMoisture: 85, minTemp: 20, maxTemp: 35, minRadiation: 70, maxRadiation: 100, growthRate: 0.2, yield: 75, price: 120 }
+                }
+            },
+            "United States of America": {
+                continent: "North America",
+                zone: "Variada",
+                soilMoisture: 55, temperature: 15, solarRadiation: 75, soilType: "Mollisoles",
+                name: "United States of America",
+                suitableCrops: {
+                    "Maíz": { minMoisture: 45, maxMoisture: 70, minTemp: 18, maxTemp: 32, minRadiation: 65, maxRadiation: 100, growthRate: 0.15, yield: 10.5, price: 550 },
+                    "Soja": { minMoisture: 50, maxMoisture: 75, minTemp: 15, maxTemp: 30, minRadiation: 60, maxRadiation: 95, growthRate: 0.12, yield: 3.5, price: 450 },
+                    "Trigo": { minMoisture: 35, maxMoisture: 65, minTemp: 10, maxTemp: 28, minRadiation: 50, maxRadiation: 90, growthRate: 0.1, yield: 3.2, price: 380 },
+                    "Algodón": { minMoisture: 40, maxMoisture: 70, minTemp: 20, maxTemp: 35, minRadiation: 70, maxRadiation: 100, growthRate: 0.18, yield: 1.2, price: 680 }
+                }
+            },
+            "China": {
+                continent: "Asia",
+                zone: "Variada",
+                soilMoisture: 65, temperature: 16, solarRadiation: 70, soilType: "Variados",
+                name: "China",
+                suitableCrops: {
+                    "Arroz": { minMoisture: 70, maxMoisture: 90, minTemp: 20, maxTemp: 35, minRadiation: 60, maxRadiation: 90, growthRate: 0.14, yield: 6.8, price: 520 },
+                    "Trigo": { minMoisture: 35, maxMoisture: 65, minTemp: 10, maxTemp: 28, minRadiation: 50, maxRadiation: 90, growthRate: 0.1, yield: 5.2, price: 380 },
+                    "Maíz": { minMoisture: 45, maxMoisture: 70, minTemp: 18, maxTemp: 32, minRadiation: 65, maxRadiation: 100, growthRate: 0.15, yield: 6.3, price: 550 },
+                    "Té": { minMoisture: 60, maxMoisture: 80, minTemp: 15, maxTemp: 25, minRadiation: 50, maxRadiation: 80, growthRate: 0.06, yield: 0.8, price: 1500 }
+                }
+            },
+            "India": {
+                continent: "Asia",
+                zone: "Tropical",
+                soilMoisture: 70, temperature: 28, solarRadiation: 85, soilType: "Aluvial",
+                name: "India",
+                suitableCrops: {
+                    "Arroz": { minMoisture: 70, maxMoisture: 90, minTemp: 20, maxTemp: 35, minRadiation: 60, maxRadiation: 90, growthRate: 0.14, yield: 4.2, price: 520 },
+                    "Trigo": { minMoisture: 35, maxMoisture: 65, minTemp: 10, maxTemp: 28, minRadiation: 50, maxRadiation: 90, growthRate: 0.1, yield: 3.5, price: 380 },
+                    "Algodón": { minMoisture: 40, maxMoisture: 70, minTemp: 20, maxTemp: 35, minRadiation: 70, maxRadiation: 100, growthRate: 0.18, yield: 0.9, price: 680 },
+                    "Caña de Azúcar": { minMoisture: 65, maxMoisture: 85, minTemp: 20, maxTemp: 35, minRadiation: 70, maxRadiation: 100, growthRate: 0.2, yield: 70, price: 120 }
+                }
+            }
+        };
+
+        // Eventos aleatorios
+        const events = [
+            { type: "sequía", effect: -0.2, duration: 15000, message: "¡Sequía! El crecimiento se reduce en 20%." },
+            { type: "plaga", effect: -0.3, duration: 10000, message: "¡Plaga de insectos! El crecimiento se reduce en 30%." },
+            { type: "lluvia", effect: 0.1, duration: 12000, message: "¡Lluvias intensas! El crecimiento aumenta en 10%." },
+            { type: "helada", effect: -0.4, duration: 8000, message: "¡Helada! El crecimiento se reduce en 40%." },
+            { type: "calor extremo", effect: -0.25, duration: 10000, message: "¡Ola de calor! El crecimiento se reduce en 25%." },
+            { type: "fertilizante", effect: 0.3, duration: 10000, message: "¡Fertilizante natural! El crecimiento aumenta en 30%." },
+            { type: "buen clima", effect: 0.2, duration: 15000, message: "¡Buen clima! El crecimiento aumenta en 20%." }
+        ];
+
+        // Función para obtener el centro de un país
+        function getCountryCenter(countryName) {
+            const centers = {
+                "Argentina": [-34.6037, -58.3816],
+                "Brazil": [-15.7797, -47.9297],
+                "United States of America": [37.0902, -95.7129],
+                "China": [35.8617, 104.1954],
+                "India": [20.5937, 78.9629],
+                "Spain": [40.4637, -3.7492],
+                "France": [46.6034, 1.8883],
+                "Germany": [51.1657, 10.4515],
+                "Italy": [41.8719, 12.5674],
+                "United Kingdom": [55.3781, -3.4360],
+                "Russia": [61.5240, 105.3188],
+                "Canada": [56.1304, -106.3468],
+                "Mexico": [19.4326, -99.1332],
+                "Australia": [-25.2744, 133.7751],
+                "Japan": [36.2048, 138.2529],
+                "South Africa": [-30.5595, 22.9375],
+                "Egypt": [26.8206, 30.8025],
+                "Nigeria": [9.0820, 8.6753]
+            };
+            return centers[countryName] || [0, 0];
+        }
+
+        // Función para obtener el continente de un país
+        function getContinent(countryName) {
+            const continentByRegion = {
+                // América
+                "Argentina": "South America",
+                "Bolivia": "South America",
+                "Brazil": "South America",
+                "Chile": "South America",
+                "Colombia": "South America",
+                "Ecuador": "South America",
+                "Paraguay": "South America",
+                "Peru": "South America",
+                "Uruguay": "South America",
+                "Venezuela": "South America",
+                "United States of America": "North America",
+                "Canada": "North America",
+                "Mexico": "North America",
+
+                // Europa
+                "Spain": "Europe",
+                "France": "Europe",
+                "Germany": "Europe",
+                "Italy": "Europe",
+                "United Kingdom": "Europe",
+                "Russia": "Europe",
+
+                // Asia
+                "China": "Asia",
+                "India": "Asia",
+                "Japan": "Asia",
+                "Indonesia": "Asia",
+                "Pakistan": "Asia",
+                "Bangladesh": "Asia",
+                "Turkey": "Asia",
+                "Iran": "Asia",
+                "Thailand": "Asia",
+                "Vietnam": "Asia",
+                "Philippines": "Asia",
+
+                // África
+                "Egypt": "Africa",
+                "Nigeria": "Africa",
+                "South Africa": "Africa",
+
+                // Oceanía
+                "Australia": "Oceania"
+            };
+            return continentByRegion[countryName] || "default";
+        }
+
+        // Función para mostrar datos agrícolas
+        function showAgriculturalData(countryName, translatedName) {
+            const dataPanel = document.getElementById('agricultural-data-panel');
+            const dataContent = document.getElementById('agricultural-data-content');
+            
+            // Obtener datos del país
+            const countryInfo = countryData[countryName];
+            
+            if (!countryInfo) {
+                // Si no hay datos específicos, mostrar información genérica
+                const continent = getContinent(countryName);
+                dataContent.innerHTML = `
+                    <div class="country-info-section">
+                        <h4>${translatedName}</h4>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Continente:</span>
+                            <span class="condition-value">${continent}</span>
+                        </div>
+                        <p>No hay datos agrícolas específicos disponibles para este país.</p>
+                    </div>
+                `;
+            } else {
+                // Mostrar datos específicos del país
+                dataContent.innerHTML = `
+                    <div class="country-info-section">
+                        <h4>${translatedName}</h4>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Continente:</span>
+                            <span class="condition-value">${countryInfo.continent}</span>
+                        </div>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Zona climática:</span>
+                            <span class="condition-value">${countryInfo.zone}</span>
+                        </div>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Tipo de suelo:</span>
+                            <span class="condition-value">${countryInfo.soilType}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="country-info-section">
+                        <h4>Condiciones Actuales</h4>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Humedad del suelo:</span>
+                            <span class="condition-value">${countryInfo.soilMoisture}%</span>
+                        </div>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Temperatura:</span>
+                            <span class="condition-value">${countryInfo.temperature}°C</span>
+                        </div>
+                        <div class="condition-indicator">
+                            <span class="condition-label">Radiación solar:</span>
+                            <span class="condition-value">${countryInfo.solarRadiation}%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="country-info-section">
+                        <h4>Cultivos Adecuados</h4>
+                        ${Object.entries(countryInfo.suitableCrops).map(([cropName, cropData]) => `
+                            <div class="crop-item">
+                                <div class="crop-name">${cropName}</div>
+                                <div class="crop-details">
+                                    <div>Temperatura: ${cropData.minTemp}°C - ${cropData.maxTemp}°C</div>
+                                    <div>Humedad: ${cropData.minMoisture}% - ${cropData.maxMoisture}%</div>
+                                    <div>Radiación: ${cropData.minRadiation}% - ${cropData.maxRadiation}%</div>
+                                </div>
+                                <div class="crop-yield">
+                                    <span>Rendimiento: ${cropData.yield} t/ha</span>
+                                    <span>Precio: $${cropData.price}/t</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            // Mostrar el panel
+            dataPanel.style.display = 'block';
+        }
+
+        // Función para inicializar el mapa
+        function initializeMap() {
+            // Crear el mapa centrado en el mundo
+            map = L.map('map').setView([20, 0], 2);
+            
+            // Añadir capa base (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Cargar datos de países desde GeoJSON
+            fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Añadir países al mapa
+                    L.geoJSON(data, {
+                        style: function(feature) {
+                            // Determinar el continente
+                            const countryName = feature.properties.name;
+                            const continent = getContinent(countryName);
+                            
+                            return {
+                                fillColor: continentColors[continent] || continentColors["default"],
+                                weight: 1,
+                                opacity: 1,
+                                color: 'white',
+                                fillOpacity: 0.7
+                            };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            // Añadir información al hacer hover
+                            const countryName = feature.properties.name;
+                            const translatedName = countryTranslations[countryName] || countryName;
+                            const continent = getContinent(countryName);
+                            
+                            layer.bindTooltip(`
+                                <strong>${translatedName}</strong><br>
+                                <em>${continent}</em>
+                            `, {
+                                permanent: false,
+                                direction: 'center',
+                                className: 'country-label'
+                            });
+                            
+                            // Añadir evento de clic
+                            layer.on('click', function(e) {
+                                selectCountry(countryName, translatedName, layer);
+                            });
+                            
+                            // Efecto hover
+                            layer.on('mouseover', function() {
+                                layer.setStyle({
+                                    weight: 2,
+                                    color: '#FF0000',
+                                    fillOpacity: 0.9
+                                });
+                            });
+                            
+                            layer.on('mouseout', function() {
+                                // Restaurar estilo original
+                                const countryName = feature.properties.name;
+                                const continent = getContinent(countryName);
+                                
+                                layer.setStyle({
+                                    fillColor: continentColors[continent] || continentColors["default"],
+                                    weight: 1,
+                                    opacity: 1,
+                                    color: 'white',
+                                    fillOpacity: 0.7
+                                });
+                            });
+                        }
+                    }).addTo(map);
+                })
+                .catch(error => console.error('Error al cargar los datos de países:', error));
+
+            // Generar eventos aleatorios cada cierto tiempo
+            setInterval(generateRandomEvent, 20000);
+        }
+
+        // Función para seleccionar un país
+        function selectCountry(countryName, translatedName, layer) {
+            selectedCountry = {
+                name: countryName,
+                translatedName: translatedName,
+                layer: layer
+            };
+            
+            // Resaltar el país seleccionado
+            layer.setStyle({
+                weight: 3,
+                color: '#FF0000',
+                fillOpacity: 0.9
+            });
+            
+            // Mostrar datos agrícolas
+            showAgriculturalData(countryName, translatedName);
+            
+            // Actualizar información del país seleccionado
+            document.getElementById('selected-country').textContent = translatedName;
+            
+            // Mostrar opciones de cultivo
+            document.getElementById('crop-options').style.display = 'block';
+        }
+
+        // Función para plantar un cultivo
+        function plantCrop(cropType) {
+            if (!selectedCountry) {
+                alert('Por favor, selecciona un país primero.');
+                return;
+            }
+            
+            // Costos de los cultivos
+            const cropCosts = {
+                'wheat': 10,
+                'corn': 15,
+                'rice': 20,
+                'soy': 25
+            };
+            
+            const cost = cropCosts[cropType];
+            
+            if (money < cost) {
+                alert('No tienes suficiente dinero para plantar este cultivo.');
+                return;
+            }
+            
+            // Restar dinero
+            money -= cost;
+            
+            // Registrar cultivo plantado
+            const countryKey = selectedCountry.name;
+            if (!plantedSeeds[countryKey]) {
+                plantedSeeds[countryKey] = [];
+            }
+            
+            plantedSeeds[countryKey].push({
+                type: cropType,
+                plantedAt: Date.now(),
+                growth: 0
+            });
+            
+            // Añadir marcador visual
+            const center = getCountryCenter(countryKey);
+            if (center[0] !== 0 && center[1] !== 0) {
+                const marker = L.marker(center, {
+                    icon: L.divIcon({
+                        className: 'crop-marker',
+                        html: getCropIcon(cropType),
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+                
+                if (!seedMarkers[countryKey]) {
+                    seedMarkers[countryKey] = [];
+                }
+                seedMarkers[countryKey].push(marker);
+            }
+            
+            // Actualizar estadísticas
+            updateGameStats();
+            
+            // Actualizar misiones
+            updateMissionProgress(1, 1);
+            
+            alert(`Has plantado ${getCropName(cropType)} en ${selectedCountry.translatedName}.`);
+        }
+
+        // Función para obtener el nombre del cultivo
+        function getCropName(cropType) {
+            const cropNames = {
+                'wheat': 'trigo',
+                'corn': 'maíz',
+                'rice': 'arroz',
+                'soy': 'soja'
+            };
+            
+            return cropNames[cropType] || cropType;
+        }
+
+        // Función para obtener el ícono del cultivo
+        function getCropIcon(cropType) {
+            const cropIcons = {
+                'wheat': '🌾',
+                'corn': '🌽',
+                'rice': '🍚',
+                'soy': '🫘'
+            };
+            
+            return cropIcons[cropType] || '🌱';
+        }
+
+        // Función para cosechar cultivos
+        function harvestCrops() {
+            if (!selectedCountry) {
+                alert('Por favor, selecciona un país primero.');
+                return;
+            }
+            
+            const countryKey = selectedCountry.name;
+            const crops = plantedSeeds[countryKey];
+            
+            if (!crops || crops.length === 0) {
+                alert('No hay cultivos para cosechar en este país.');
+                return;
+            }
+            
+            let totalHarvest = 0;
+            let harvestedCount = 0;
+            
+            // Calcular ganancias por cultivo
+            crops.forEach(crop => {
+                const cropValues = {
+                    'wheat': 20,
+                    'corn': 30,
+                    'rice': 40,
+                    'soy': 50
+                };
+                
+                totalHarvest += cropValues[crop.type] || 0;
+                harvestedCount++;
+            });
+            
+            // Añadir dinero
+            money += totalHarvest;
+            
+            // Aumentar puntuación
+            score += totalHarvest * 2;
+            
+            // Eliminar marcadores
+            if (seedMarkers[countryKey]) {
+                seedMarkers[countryKey].forEach(marker => {
+                    map.removeLayer(marker);
+                });
+                seedMarkers[countryKey] = [];
+            }
+            
+            // Limpiar cultivos plantados
+            plantedSeeds[countryKey] = [];
+            
+            // Actualizar estadísticas
+            updateGameStats();
+            
+            // Actualizar misiones
+            updateMissionProgress(2, harvestedCount);
+            
+            alert(`Has cosechado ${harvestedCount} cultivos en ${selectedCountry.translatedName} y ganado $${totalHarvest}.`);
+        }
+
+        // Función para actualizar el progreso de las misiones
+        function updateMissionProgress(missionId, progress) {
+            const mission = missions.find(m => m.id === missionId);
+            if (mission && !mission.completed) {
+                mission.progress += progress;
+                
+                if (mission.progress >= mission.target) {
+                    mission.completed = true;
+                    money += mission.reward;
+                    score += mission.reward * 2;
+                    alert(`¡Misión completada! Has ganado $${mission.reward}.`);
+                }
+                
+                updateMissions();
+            }
+        }
+
+        // Función para actualizar estadísticas del juego
+        function updateGameStats() {
+            document.getElementById('money').textContent = money;
+            document.getElementById('score').textContent = Math.round(score);
+            document.getElementById('level').textContent = level;
+            
+            checkLevels();
+            updateMissions();
+            updateLevelInfo();
+        }
+
+        // Función para actualizar misiones
+        function updateMissions() {
+            const missionsContainer = document.getElementById('missions');
+            if (missionsContainer) {
+                missionsContainer.innerHTML = '<h3>Misiones</h3>';
+                missions.forEach(mission => {
+                    const missionElement = document.createElement('div');
+                    missionElement.className = `mission ${mission.completed ? 'completed' : ''}`;
+                    missionElement.innerHTML = `
+                        <strong>${mission.description}</strong>
+                        <div class="progress">${mission.progress}/${mission.target}</div>
+                    `;
+                    missionsContainer.appendChild(missionElement);
+                });
+            }
+        }
+
+        // Función para actualizar información de niveles
+        function updateLevelInfo() {
+            const levelInfoContainer = document.getElementById('level-info');
+            if (levelInfoContainer) {
+                levelInfoContainer.innerHTML = '<h3>Niveles</h3>';
+                levels.forEach(levelData => {
+                    const levelElement = document.createElement('div');
+                    levelElement.className = `level ${levelData.unlocked ? '' : 'locked'}`;
+                    levelElement.innerHTML = `
+                        <strong>Nivel ${levelData.id}: ${levelData.description}</strong>
+                        ${levelData.unlocked ? '' : `<div>Requerido: ${levelData.requiredScore} puntos</div>`}
+                    `;
+                    levelInfoContainer.appendChild(levelElement);
+                });
+            }
+        }
+
+        // Función para verificar y actualizar niveles
+        function checkLevels() {
+            levels.forEach(levelData => {
+                if (!levelData.unlocked && score >= levelData.requiredScore) {
+                    levelData.unlocked = true;
+                    level = levelData.id;
+                    alert(`¡Felicidades! Has alcanzado el nivel ${levelData.id}: ${levelData.description}`);
+                }
+            });
+        }
+
+        // Función para generar evento aleatorio
+        function generateRandomEvent() {
+            const countriesWithCrops = Object.keys(plantedSeeds);
+            if (countriesWithCrops.length === 0) return;
+
+            const randomCountry = countriesWithCrops[Math.floor(Math.random() * countriesWithCrops.length)];
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+
+            activeEvents[randomCountry] = {
+                type: randomEvent.type,
+                effect: randomEvent.effect,
+                message: randomEvent.message,
+                timeout: setTimeout(() => {
+                    delete activeEvents[randomCountry];
+                }, randomEvent.duration)
+            };
+
+            alert(`¡Evento en ${countryTranslations[randomCountry] || randomCountry}! ${randomEvent.message}`);
+        }
+
+        // Función para iniciar el juego
+        function startGame() {
+            // Ocultar pantalla de inicio
+            document.getElementById('start-screen').classList.add('hidden');
+            
+            // Mostrar contenedor del juego
+            document.getElementById('game-container').style.display = 'block';
+            const backgroundMenuMusic = document.getElementById('menu-music');
+            backgroundMenuMusic.pause();
+            const backgroundMusic = document.getElementById('game-music');
+            backgroundMusic.play();
+            // Inicializar el mapa
+            initializeMap();
+            
+            // Actualizar estadísticas del juego
+            updateGameStats();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const backgroundMenuMusic = document.getElementById('menu-music');
+            backgroundMenuMusic.play();
+            // Botón PLAY
+            document.getElementById('play-button').addEventListener('click', startGame);
+            
+            // Botón OPTIONS
+            document.getElementById('options-button').addEventListener('click', function() {
+                document.getElementById('options-screen').style.display = 'flex';
+            });
+            
+            // Botón BACK en opciones
+            document.getElementById('back-button').addEventListener('click', function() {
+                document.getElementById('options-screen').style.display = 'none';
+            });
+            
+            // Selector de idioma
+            document.getElementById('english-lang').addEventListener('click', function() {
+                alert('Idioma cambiado a inglés');
+                // Aquí puedes implementar la lógica para cambiar el idioma
+            });
+            
+            document.getElementById('spanish-lang').addEventListener('click', function() {
+                alert('Idioma cambiado a español');
+                // Aquí puedes implementar la lógica para cambiar el idioma
+            });
+        });
+    </script>
 </body>
 </html>
